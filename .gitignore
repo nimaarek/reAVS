@@ -39,6 +39,126 @@ report.md
 *.aab
 !tests/reporting/golden/report.json
 
-# OS
+# ================================
+# Python compiled files
+# ================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.pyo
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+# ================================
+# Virtual environments
+# ================================
+.venv/
+venv/
+ENV/
+env/
+.env/
+.env.local
+.env.*.local
+*.venv
+# ================================
+# IDE settings
+# ================================
+.vscode/
+*.code-workspace
+.vscode-test/
+# PyCharm
+.idea/
+*.iml
+.python-version
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+# Vim
+*.swp
+*.swo
+*~
+# Emacs
+*~
+\#*\#
+.\#*
+# ================================
+# OS files
+# ================================
 .DS_Store
 Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+# ================================
+# Logs and databases
+# ================================
+*.log
+*.sqlite
+*.db
+*.sqlite3
+# ================================
+# Environment variables
+# ================================
+.env
+.env.local
+*.env
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+*.log
+*.pot
+*.mo
+*.db
+*.sqlite
+*.sqlite3
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+.python-version
+.env
+logs/
+*.log
+*.sqlite
+*.db
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.circleci/
+.github/
+*.pem
+*.key
+*.crt
+*.csr
+secrets/
+config.ini
+config.local.ini
+*.secret
+*.env
+.env

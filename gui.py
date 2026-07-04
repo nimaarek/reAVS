@@ -9,7 +9,7 @@ import customtkinter as ctk
 
 from core.persian_reporter import PersianReporter
 
-# تنظیمات ظاهری
+# Appearance settings
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -18,86 +18,89 @@ class ReAVSGUI(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("reAVS - تحلیلگر امنیتی اندروید")
+        self.title("reAVS - Android Security Analyzer")
         self.geometry("900x700")
         self.minsize(800, 600)
 
-        # متغیرها
+        # Variables
         self.apk_path = None
         self.json_report_path = None
+        self.persian_report_path = None
         self.analysis_thread = None
 
-        # ساخت ویجت‌ها
+        # Build widgets
         self._create_widgets()
 
     def _create_widgets(self):
-        """ساخت تمام ویجت‌های رابط کاربری"""
+        """Create all GUI widgets"""
 
-        # ===== فریم بالا (انتخاب فایل) =====
+        # ===== Top Frame (File Selection) =====
         self.top_frame = ctk.CTkFrame(self)
         self.top_frame.pack(pady=10, padx=20, fill="x")
 
         self.file_label = ctk.CTkLabel(
-            self.top_frame, text="هیچ فایلی انتخاب نشده است", font=("IRANSans", 12)
+            self.top_frame, text="No file selected", font=("Segoe UI", 12)
         )
         self.file_label.pack(side="left", padx=10)
 
         self.select_btn = ctk.CTkButton(
-            self.top_frame, text="📂 انتخاب APK", command=self.select_apk, width=120
+            self.top_frame, text="📂 Select APK", command=self.select_apk, width=120
         )
         self.select_btn.pack(side="right", padx=10)
 
-        # ===== فریم میانی (کنترل‌ها) =====
+        # ===== Middle Frame (Controls) =====
         self.mid_frame = ctk.CTkFrame(self)
         self.mid_frame.pack(pady=10, padx=20, fill="x")
 
-        # دکمه شروع تحلیل
+        # Analyze button
         self.analyze_btn = ctk.CTkButton(
             self.mid_frame,
-            text="🔍 شروع تحلیل",
+            text="🔍 Start Analysis",
             command=self.start_analysis,
             state="disabled",
             height=40,
-            font=("IRANSans", 14, "bold"),
+            font=("Segoe UI", 14, "bold"),
         )
         self.analyze_btn.pack(pady=5)
 
-        # نوار پیشرفت
+        # Progress bar
         self.progressbar = ctk.CTkProgressBar(self.mid_frame)
         self.progressbar.pack(pady=5, fill="x")
         self.progressbar.set(0)
 
-        # وضعیت
+        # Status label
         self.status_label = ctk.CTkLabel(
-            self.mid_frame, text="⏳ منتظر انتخاب فایل...", font=("IRANSans", 11)
+            self.mid_frame,
+            text="⏳ Waiting for file selection...",
+            font=("Segoe UI", 11),
         )
         self.status_label.pack(pady=5)
 
-        # ===== فریم پایین (نمایش خروجی) =====
+        # ===== Bottom Frame (Output Display) =====
         self.bottom_frame = ctk.CTkFrame(self)
         self.bottom_frame.pack(pady=10, padx=20, fill="both", expand=True)
 
-        # تب‌ها
+        # Tabs
         self.tabview = ctk.CTkTabview(self.bottom_frame)
         self.tabview.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # تب خروجی JSON
-        self.tab_json = self.tabview.add("📄 خروجی JSON")
+        # JSON Output tab
+        self.tab_json = self.tabview.add("📄 JSON Output")
         self.json_textbox = ctk.CTkTextbox(self.tab_json, wrap="none")
         self.json_textbox.pack(fill="both", expand=True)
 
-        # تب گزارش فارسی
-        self.tab_persian = self.tabview.add("🇮🇷 گزارش فارسی")
+        # Persian Report tab
+        self.tab_persian = self.tabview.add("🇮🇷 Persian Report")
         self.persian_textbox = ctk.CTkTextbox(self.tab_persian, wrap="word")
         self.persian_textbox.pack(fill="both", expand=True)
 
-        # دکمه‌های پایین
+        # ===== Bottom Buttons =====
         self.btn_frame = ctk.CTkFrame(self)
         self.btn_frame.pack(pady=10, padx=20, fill="x")
 
         self.save_json_btn = ctk.CTkButton(
             self.btn_frame,
-            text="💾 ذخیره JSON",
+            text="💾 Save JSON",
             command=self.save_json,
             state="disabled",
             width=120,
@@ -106,7 +109,7 @@ class ReAVSGUI(ctk.CTk):
 
         self.save_md_btn = ctk.CTkButton(
             self.btn_frame,
-            text="📝 ذخیره گزارش فارسی",
+            text="📝 Save Persian Report",
             command=self.save_persian_report,
             state="disabled",
             width=150,
@@ -114,17 +117,14 @@ class ReAVSGUI(ctk.CTk):
         self.save_md_btn.pack(side="left", padx=5)
 
         self.clear_btn = ctk.CTkButton(
-            self.btn_frame,
-            text="🗑️ پاک کردن خروجی",
-            command=self.clear_output,
-            width=120,
+            self.btn_frame, text="🗑️ Clear Output", command=self.clear_output, width=120
         )
         self.clear_btn.pack(side="right", padx=5)
 
     def select_apk(self):
-        """انتخاب فایل APK توسط کاربر"""
+        """Select APK file via file dialog"""
         file_path = filedialog.askopenfilename(
-            title="انتخاب فایل APK",
+            title="Select APK File",
             filetypes=[("APK files", "*.apk"), ("All files", "*.*")],
         )
 
@@ -132,28 +132,28 @@ class ReAVSGUI(ctk.CTk):
             self.apk_path = Path(file_path)
             self.file_label.configure(text=f"✅ {self.apk_path.name}")
             self.analyze_btn.configure(state="normal")
-            self.status_label.configure(text="✅ فایل انتخاب شد. آماده برای تحلیل.")
+            self.status_label.configure(text="✅ File selected. Ready for analysis.")
 
     def start_analysis(self):
-        """شروع فرآیند تحلیل در یک ترد جداگانه"""
+        """Start analysis process in a separate thread"""
         if not self.apk_path:
             return
 
-        # غیرفعال کردن دکمه‌ها
-        self.analyze_btn.configure(state="disabled", text="⏳ در حال تحلیل...")
+        # Disable buttons during analysis
+        self.analyze_btn.configure(state="disabled", text="⏳ Analyzing...")
         self.select_btn.configure(state="disabled")
         self.progressbar.set(0.2)
-        self.status_label.configure(text="🔄 در حال تحلیل، لطفاً صبر کنید...")
+        self.status_label.configure(text="🔄 Analyzing, please wait...")
         self.clear_output()
 
-        # اجرای تحلیل در ترد
+        # Run analysis in thread
         self.analysis_thread = threading.Thread(target=self._run_analysis, daemon=True)
         self.analysis_thread.start()
 
     def _run_analysis(self):
-        """اجرای واقعی تحلیل (در ترد جداگانه)"""
+        """Actual analysis execution (runs in separate thread)"""
         try:
-            # اجرای دستور avs.py
+            # Build command
             json_output = self.apk_path.parent / f"{self.apk_path.stem}_report.json"
 
             cmd = [
@@ -162,44 +162,44 @@ class ReAVSGUI(ctk.CTk):
                 str(self.apk_path),
                 "--out",
                 str(json_output),
-                "--deep",  # حالت پیش‌فرض deep برای گزارش کامل‌تر
+                "--deep",  # Default to deep mode for comprehensive results
             ]
 
             self.progressbar.set(0.5)
 
-            # اجرا و گرفتن خروجی
+            # Execute and capture output
             result = subprocess.run(
                 cmd, capture_output=True, text=True, encoding="utf-8"
             )
 
             self.progressbar.set(0.8)
 
-            # نمایش خروجی در GUI
+            # Display results in GUI
             if result.returncode == 0 and json_output.exists():
                 self.json_report_path = json_output
 
-                # نمایش محتوای JSON
+                # Display JSON content
                 with open(json_output, "r", encoding="utf-8") as f:
                     json_data = json.load(f)
                     pretty_json = json.dumps(json_data, indent=2, ensure_ascii=False)
 
                 self.after(0, lambda: self._display_json(pretty_json))
 
-                # تولید گزارش فارسی
+                # Generate Persian report
                 try:
                     md_path = PersianReporter.generate_report(json_output)
                     with open(md_path, "r", encoding="utf-8") as f:
                         md_content = f.read()
                     self.after(0, lambda: self._display_persian(md_content))
 
-                    # ذخیره مسیر گزارش فارسی
+                    # Store Persian report path
                     self.persian_report_path = md_path
 
                 except Exception as e:
                     self.after(
                         0,
                         lambda: self._display_persian(
-                            f"❌ خطا در تولید گزارش فارسی:\n{str(e)}"
+                            f"❌ Error generating Persian report:\n{str(e)}"
                         ),
                     )
 
@@ -208,57 +208,56 @@ class ReAVSGUI(ctk.CTk):
                 self.after(
                     0,
                     lambda: self.status_label.configure(
-                        text=f"✅ تحلیل کامل شد! {len(json_data.get('findings', []))} یافته شناسایی شد."
+                        text=f"✅ Analysis complete! {len(json_data.get('findings', []))} findings identified."
                     ),
                 )
 
             else:
                 error_msg = (
-                    result.stderr if result.stderr else "خطای ناشناخته در حین تحلیل"
+                    result.stderr if result.stderr else "Unknown error during analysis"
                 )
                 self.after(
-                    0, lambda: self._display_json(f"❌ خطا در تحلیل:\n{error_msg}")
+                    0, lambda: self._display_json(f"❌ Analysis error:\n{error_msg}")
                 )
                 self.progressbar.set(0)
                 self.after(
-                    0,
-                    lambda: self.status_label.configure(
-                        text="❌ تحلیل با خطا مواجه شد"
-                    ),
+                    0, lambda: self.status_label.configure(text="❌ Analysis failed")
                 )
 
         except Exception as e:
-            self.after(0, lambda: self._display_json(f"❌ خطای غیرمنتظره:\n{str(e)}"))
+            self.after(0, lambda: self._display_json(f"❌ Unexpected error:\n{str(e)}"))
             self.progressbar.set(0)
-            self.after(0, lambda: self.status_label.configure(text="❌ خطا در اجرا"))
+            self.after(
+                0, lambda: self.status_label.configure(text="❌ Execution error")
+            )
 
         finally:
-            # فعال‌سازی مجدد دکمه‌ها
+            # Re-enable buttons
             self.after(
                 0,
                 lambda: self.analyze_btn.configure(
-                    state="normal", text="🔍 شروع تحلیل مجدد"
+                    state="normal", text="🔍 Re-analyze"
                 ),
             )
             self.after(0, lambda: self.select_btn.configure(state="normal"))
 
     def _display_json(self, content):
-        """نمایش محتوا در تب JSON"""
+        """Display content in JSON tab"""
         self.json_textbox.delete("1.0", "end")
         self.json_textbox.insert("1.0", content)
 
     def _display_persian(self, content):
-        """نمایش محتوا در تب گزارش فارسی"""
+        """Display content in Persian report tab"""
         self.persian_textbox.delete("1.0", "end")
         self.persian_textbox.insert("1.0", content)
 
     def _enable_save_buttons(self):
-        """فعال کردن دکمه‌های ذخیره"""
+        """Enable save buttons"""
         self.save_json_btn.configure(state="normal")
         self.save_md_btn.configure(state="normal")
 
     def save_json(self):
-        """ذخیره فایل JSON با انتخاب مسیر توسط کاربر"""
+        """Save JSON file with user-selected path"""
         if not self.json_report_path:
             return
 
@@ -272,12 +271,14 @@ class ReAVSGUI(ctk.CTk):
             import shutil
 
             shutil.copy(self.json_report_path, save_path)
-            messagebox.showinfo("موفق", f"فایل JSON در {save_path} ذخیره شد.")
+            messagebox.showinfo("Success", f"JSON file saved to {save_path}")
 
     def save_persian_report(self):
-        """ذخیره گزارش فارسی با انتخاب مسیر توسط کاربر"""
-        if not hasattr(self, "persian_report_path"):
-            messagebox.showwarning("اخطار", "هنوز گزارش فارسی تولید نشده است.")
+        """Save Persian report with user-selected path"""
+        if not hasattr(self, "persian_report_path") or not self.persian_report_path:
+            messagebox.showwarning(
+                "Warning", "No Persian report has been generated yet."
+            )
             return
 
         save_path = filedialog.asksaveasfilename(
@@ -290,10 +291,10 @@ class ReAVSGUI(ctk.CTk):
             import shutil
 
             shutil.copy(self.persian_report_path, save_path)
-            messagebox.showinfo("موفق", f"گزارش فارسی در {save_path} ذخیره شد.")
+            messagebox.showinfo("Success", f"Persian report saved to {save_path}")
 
     def clear_output(self):
-        """پاک کردن محتوای هر دو تب"""
+        """Clear content from both tabs"""
         self.json_textbox.delete("1.0", "end")
         self.persian_textbox.delete("1.0", "end")
         self.save_json_btn.configure(state="disabled")

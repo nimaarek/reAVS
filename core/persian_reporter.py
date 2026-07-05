@@ -1,84 +1,82 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 
 class PersianReporter:
-    """ساخت گزارش فارسی به فرمت Markdown از خروجی JSON reAVS"""
+    """Generate Persian Markdown reports from reAVS JSON output"""
 
     SEVERITY_FA_PERSIAN = {
-        "CRITICAL": "🔴 بحرانی",
-        "HIGH": "🟠 بالا",
-        "MEDIUM": "🟡 متوسط",
-        "LOW": "🟢 پایین",
-        "INFO": "ℹ️ اطلاعاتی"
+        "CRITICAL": "🔴 Critical",
+        "HIGH": "🟠 High",
+        "MEDIUM": "🟡 Medium",
+        "LOW": "🟢 Low",
+        "INFO": "ℹ️ Info",
     }
 
     @classmethod
     def generate_report(cls, json_path: Path, output_path: Path = None) -> Path:
-        """
-        تولید گزارش فارسی از فایل JSON
-
-        Args:
-            json_path: مسیر فایل JSON خروجی reAVS
-            output_path: مسیر خروجی دلخواه (اختیاری)
-
-        Returns:
-            مسیر فایل Markdown تولید شده
-        """
-        with open(json_path, 'r', encoding='utf-8') as f:
+        """Generate Persian report from JSON file"""
+        with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
         if output_path is None:
-            output_path = json_path.parent / f"persian_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            output_path = (
+                json_path.parent
+                / f"persian_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+            )
 
         md_content = cls._build_markdown(data)
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(md_content)
 
         return output_path
 
     @classmethod
     def _build_markdown(cls, data: Dict[str, Any]) -> str:
-        """ساخت محتوای Markdown از داده‌های JSON"""
+        """Build Markdown content from JSON data"""
 
-        findings = data.get('findings', [])
-        metadata = data.get('metadata', {})
+        findings = data.get("findings", [])
+        metadata = data.get("metadata", {})
 
         lines = [
-            "# 📱 گزارش تحلیل امنیتی APK",
+            "# 📱 Android APK Security Analysis Report",
             "",
-            f"**نام فایل:** `{metadata.get('apk_name', 'نامشخص')}`",
-            f"**تاریخ تحلیل:** {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}",
-            f"**حالت تحلیل:** {metadata.get('scan_mode', 'نامشخص')}",
-            f"**تعداد یافته‌ها:** {len(findings)}",
+            f"**File Name:** `{metadata.get('apk_name', 'Unknown')}`",
+            f"**Analysis Date:** {datetime.now().strftime('%Y/%m/%d %H:%M:%S')}",
+            f"**Scan Mode:** {metadata.get('scan_mode', 'Unknown')}",
+            f"**Total Findings:** {len(findings)}",
             "",
             "---",
             "",
-            "## 📊 خلاصه یافته‌ها بر اساس شدت",
-            ""
+            "## 📊 Summary by Severity",
+            "",
         ]
 
-        # آمار بر اساس شدت
         severity_count = {}
         for finding in findings:
-            sev = finding.get('severity', 'INFO')
+            sev = finding.get("severity", "INFO")
             severity_count[sev] = severity_count.get(sev, 0) + 1
 
         for sev, count in severity_count.items():
             persian_sev = cls.SEVERITY_FA_PERSIAN.get(sev, sev)
-            lines.append(f"- **{persian_sev}**: {count} مورد")
+            lines.append(f"- **{persian_sev}**: {count} finding(s)")
 
-        lines.extend([
-            "",
-            "---",
-            "",
-            "## 🔍 جزئیات کامل یافته‌ها",
-            ""
-        ])
+        # Scanner type statistics
+        scanner_counts = {}
+        for finding in findings:
+            scanner = finding.get("scanner", "Unknown")
+            scanner_counts[scanner] = scanner_counts.get(scanner, 0) + 1
 
-        # نمایش جزئیات هر یافته
+        if scanner_counts:
+            lines.extend(["", "## 🔍 Findings by Scanner Type", ""])
+            for scanner, count in sorted(scanner_counts.items()):
+                lines.append(f"- **{scanner}**: {count} finding(s)")
+
+        lines.extend(["", "---", "", "## 🔍 Detailed Findings", ""])
+
         for idx, finding in enumerate(findings, 1):
             lines.extend(cls._format_finding(idx, finding))
             lines.append("")
@@ -87,36 +85,50 @@ class PersianReporter:
 
     @classmethod
     def _format_finding(cls, index: int, finding: Dict[str, Any]) -> List[str]:
-        """فرمت‌بندی یک یافته به صورت Markdown"""
+        """Format a single finding as Markdown"""
 
-        title = finding.get('title', 'یافته بدون عنوان')
-        severity = finding.get('severity', 'INFO')
+        title = finding.get("title", "Untitled Finding")
+        severity = finding.get("severity", "INFO")
         persian_sev = cls.SEVERITY_FA_PERSIAN.get(severity, severity)
-        description = finding.get('description', 'توضیحاتی موجود نیست')
-        location = finding.get('location', 'نامشخص')
-        recommendation = finding.get('recommendation', 'توصیه‌ای ثبت نشده است')
-        cwe = finding.get('cwe', '')
+        description = finding.get("description", "No description available")
+        location = finding.get("location", "Unknown")
+        recommendation = finding.get("recommendation", "No recommendation provided")
+        cwe = finding.get("cwe", "")
+        scanner = finding.get("scanner", "Unknown")
+        evidence = finding.get("evidence", [])
 
         lines = [
             f"### {index}. {title}",
             "",
-            f"- **شدت خطر:** {persian_sev}",
-            f"- **مکان:** `{location}`",
+            f"- **Severity:** {persian_sev}",
+            f"- **Location:** `{location}`",
+            f"- **Scanner:** `{scanner}`",
         ]
 
         if cwe:
             lines.append(f"- **CWE:** `{cwe}`")
 
-        lines.extend([
-            "",
-            f"**توضیح:**",
-            f"> {description}",
-            "",
-            f"**توصیه:**",
-            f"> {recommendation}",
-            "",
-            "---",
-            ""
-        ])
+        lines.extend(
+            [
+                "",
+                f"**Description:**",
+                f"> {description}",
+                "",
+                f"**Recommendation:**",
+                f"> {recommendation}",
+            ]
+        )
+
+        if evidence:
+            lines.extend(
+                [
+                    "",
+                    f"**Evidence:**",
+                ]
+            )
+            for item in evidence:
+                lines.append(f"> - {item}")
+
+        lines.extend(["", "---", ""])
 
         return lines

@@ -63,3 +63,51 @@ policy:
     - AES_ECB_MODE
 
   weak_digest_prefix: WEAK_DIGEST_
+
+# Updated policy with new scanner rules
+severity_mapping:
+  CRITICAL:
+    - "Hardcoded Secret in Native Library"
+    - "Intent Redirection Vulnerability"
+    - "Tainted setResult"
+  HIGH:
+    - "Cleartext Traffic Permitted"
+    - "Vulnerable Library"
+    - "Arbitrary File Write"
+    - "WebView Tainted URL"
+    - "Weak Hash Algorithm Used for Pinning"
+  MEDIUM:
+    - "Sensitive Data Leakage via Logging"
+    - "SQL Injection"
+    - "Outdated Library"
+    - "Insufficient Certificate Pins"
+    - "Empty Certificate Pinning Configuration"
+  LOW:
+    - "Debug Overrides Configured"
+    - "Dynamic Code Loading"
+    - "Runtime exec"
+  INFO:
+    - "Custom Certificate Pinning Implementation"
+    - "Malformed Network Security Config"
+
+confidence_levels:
+  HIGH:
+    - "Hardcoded Secret in Native Library"
+    - "Cleartext Traffic Permitted"
+  MEDIUM:
+    - "Intent Redirection Vulnerability"
+    - "Sensitive Data Leakage via Logging"
+  LOW:
+    - "Custom Certificate Pinning Implementation"
+
+cwe_mapping:
+  "Intent Redirection Vulnerability": "CWE-601"
+  "Sensitive Data Leakage via Logging": "CWE-532"
+  "Cleartext Traffic Permitted": "CWE-319"
+  "Vulnerable Library": "CWE-1104"
+  "Hardcoded Secret in Native Library": "CWE-798"
+  "Weak Hash Algorithm Used for Pinning": "CWE-326"
+  "Insufficient Certificate Pins": "CWE-295"
+  "Debug Overrides Configured": "CWE-250"
+  "Malformed Network Security Config": "CWE-20"
+  "Outdated Library": "CWE-1104"

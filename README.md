@@ -152,3 +152,32 @@ Rules are loaded automatically at startup.
 ```bash
 python -m pytest tests/ -v
 ```
+
+
+Summary of New Features Added
+New Scanners:
+Logging Scanner - Detects sensitive data leakage through Android logs
+
+Certificate Pinning Scanner - Analyzes certificate pinning implementations
+
+Network Config Scanner - Checks network_security_config.xml for weaknesses
+
+Third-Party Scanner - Identifies vulnerable and outdated libraries
+
+Core Improvements:
+Native Analyzer - Analyzes .so files for dangerous functions and secrets
+
+HTML Reporter - Generates interactive, visually rich HTML reports
+
+Version Comparator - Compares two analysis reports to track changes
+
+GUI Enhancements:
+Report type toggles (HTML, Persian)
+
+Comparison mode for version analysis
+
+New tabs for HTML preview and comparison results
+
+All findings now include scanner type and evidence
+
+All new features are fully integrated into the output reports (JSON, Persian Markdown, and HTML). The existing scanners remain functional alongside the new ones.

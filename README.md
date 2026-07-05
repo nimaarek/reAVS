@@ -152,3 +152,12 @@ Rules are loaded automatically at startup.
 ```bash
 python -m pytest tests/ -v
 ```
+
+reavs_gui_project/
+├── reavs_gui.py           # GUI اصلی
+├── scanner_wrapper.py     # لایه واسط برای reAVS
+├── database.py            # مدیریت SQLite
+├── report_generator.py    # تولید گزارش‌ها
+├── requirements.txt       # وابستگی‌ها
+└── assets/
+    └── (فونت‌ها و لوگو)
